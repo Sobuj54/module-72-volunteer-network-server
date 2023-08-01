@@ -27,6 +27,24 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const volunteerCollection = client
+      .db("volunteerNetwork")
+      .collection("volunteers");
+
+    const userCollection = client.db("volunteerNetwork").collection("users");
+
+    app.post("/users", async (req, res) => {
+      const users = req.body;
+      const result = await userCollection.insertOne(users);
+      res.send(result);
+    });
+
+    app.get("/volunteers", async (req, res) => {
+      const result = await volunteerCollection.find().toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
