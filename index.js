@@ -34,9 +34,23 @@ async function run() {
 
     const userCollection = client.db("volunteerNetwork").collection("users");
 
+    const eventCollection = client.db("volunteerNetwork").collection("events");
+
     app.post("/users", async (req, res) => {
       const users = req.body;
       const result = await userCollection.insertOne(users);
+      res.send(result);
+    });
+
+    app.post("/events", async (req, res) => {
+      const events = req.body;
+      console.log(events);
+      const result = await eventCollection.insertOne(events);
+      res.send(result);
+    });
+
+    app.get("/users", async (req, res) => {
+      const result = await userCollection.find().toArray();
       res.send(result);
     });
 
