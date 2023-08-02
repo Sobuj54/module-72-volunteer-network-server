@@ -12,8 +12,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.l0lz8w0.mongodb.net/?retryWrites=true&w=majority`;
 
-console.log(uri);
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -46,6 +44,17 @@ async function run() {
       const events = req.body;
       console.log(events);
       const result = await eventCollection.insertOne(events);
+      res.send(result);
+    });
+
+    app.get("/events", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      console.log(query);
+      const result = await eventCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
 
