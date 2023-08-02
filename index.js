@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const port = process.env.PORT || 5000;
 
@@ -34,6 +35,17 @@ async function run() {
 
     const eventCollection = client.db("volunteerNetwork").collection("events");
 
+    // jwt token generation
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
+      console.log(token);
+      res.send({ token });
+    });
+
     app.post("/users", async (req, res) => {
       const users = req.body;
       const result = await userCollection.insertOne(users);
@@ -47,7 +59,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/events", async (req, res) => {
+    app.get("/events", verifyJWT, async (req, res) => {
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
